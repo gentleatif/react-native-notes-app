@@ -23,8 +23,7 @@ export default function RootLayout() {
       <Stack.Screen
         name="notes"
         options={{
-          title: "Notes",
-          headerBackTitle: "Home"
+          headerTitle: "Notes"
         }}
       />
     </Stack>
