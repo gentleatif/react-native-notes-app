@@ -12,5 +12,15 @@ export function useNotes() {
     });
   }, []);
 
-  return { notes, addNote };
+  const updateNote = useCallback((id: number, title: string, description: string) => {
+    setNotes((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, title, description } : n))
+    );
+  }, []);
+
+  const deleteNote = useCallback((id: number) => {
+    setNotes((prev) => prev.filter((n) => n.id !== id));
+  }, []);
+
+  return { notes, addNote, updateNote, deleteNote };
 }

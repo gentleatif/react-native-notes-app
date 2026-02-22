@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -12,20 +12,34 @@ import {
   View
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import type { NoteForm, NoteFormErrors } from "./types";
+import type { Note, NoteForm, NoteFormErrors } from "./types";
 
 type AddNoteModalProps = {
   visible: boolean;
+  editingNote: Note | null;
   onClose: () => void;
-  onSave: (title: string, description: string) => void;
+  onSave: (title: string, description: string, id?: number) => void;
 };
 
 const INITIAL_FORM: NoteForm = { title: "", description: "" };
 const INITIAL_ERRORS: NoteFormErrors = { title: "", description: "" };
 
-export function AddNoteModal({ visible, onClose, onSave }: AddNoteModalProps) {
+export function AddNoteModal({
+  visible,
+  editingNote,
+  onClose,
+  onSave
+}: AddNoteModalProps) {
   const [form, setForm] = useState<NoteForm>(INITIAL_FORM);
   const [errors, setErrors] = useState<NoteFormErrors>(INITIAL_ERRORS);
+
+  useEffect(() => {
+    if (visible && editingNote) {
+      setForm({ title: editingNote.title, description: editingNote.description });
+    } else if (visible && !editingNote) {
+      setForm(INITIAL_FORM);
+    }
+  }, [visible, editingNote]);
 
   const handleClose = () => {
     setForm(INITIAL_FORM);
@@ -54,7 +68,7 @@ export function AddNoteModal({ visible, onClose, onSave }: AddNoteModalProps) {
       return;
     }
 
-    onSave(title, description);
+    onSave(title, description, editingNote?.id);
     handleClose();
   };
 
@@ -82,7 +96,9 @@ export function AddNoteModal({ visible, onClose, onSave }: AddNoteModalProps) {
             onStartShouldSetResponder={() => true}
           >
             <View style={styles.header}>
-              <Text style={styles.title}>Add a New Note</Text>
+              <Text style={styles.title}>
+                {editingNote ? "Edit Note" : "Add a New Note"}
+              </Text>
               <TouchableOpacity
                 onPress={handleClose}
                 style={styles.closeButton}
@@ -136,7 +152,9 @@ export function AddNoteModal({ visible, onClose, onSave }: AddNoteModalProps) {
                 style={[styles.button, styles.saveButton]}
                 onPress={handleSave}
               >
-                <Text style={styles.saveButtonText}>Save</Text>
+                <Text style={styles.saveButtonText}>
+                  {editingNote ? "Update" : "Save"}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
